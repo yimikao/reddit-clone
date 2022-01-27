@@ -20,14 +20,14 @@ CREATE TABLE "mods" (
   "sub_id" bigint NOT NULL,
   "user_id" bigint NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
-)
+);
 
 CREATE TABLE "subscribers" (
   "id" bigint PRIMARY KEY,
   "sub_id" bigint NOT NULL,
   "user_id" bigint NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
-)
+);
 
 CREATE TABLE "posts" (
   "id" bigserial PRIMARY KEY,
@@ -43,6 +43,7 @@ CREATE TABLE "comments" (
   "commenter_id" bigint NOT NULL,
   "parent_comment_id" bigint NULL,
   "post_id" bigint NOT NULL,
+  "points" bigint NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
@@ -64,7 +65,7 @@ ALTER TABLE "comments" ADD FOREIGN KEY ("commenter_id") REFERENCES "users" ("id"
 
 ALTER TABLE "comments" ADD FOREIGN KEY ("post_id") REFERENCES "posts" ("id");
 
-ALTER TABLE "comments" ADD FOREIGN KEY ("parent_comment_id") REFERENCES "comment" ("id");
+ALTER TABLE "comments" ADD FOREIGN KEY ("parent_comment_id") REFERENCES "comments" ("id");
 
 
 -- CREATE INDEX ON "accounts" ("owner");
