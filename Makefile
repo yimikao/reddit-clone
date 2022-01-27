@@ -6,13 +6,13 @@ dropdb: ; sudo docker exec -it redditclone dropdb redditclone
 
 schema: ; migrate create -ext sql -dir db/migration -seq init_schema
 
-migrateup: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5432/redditclone?sslmode=disable" -verbose up
+migrateup: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5431/redditclone?sslmode=disable" -verbose up
 
-migratedown: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5432/redditclone?sslmode=disable" -verbose down
+migratedown: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5431/redditclone?sslmode=disable" -verbose down
 
-migrateup1: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5432/redditclone?sslmode=disable" -verbose up 1
+migrateup1: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5431/redditclone?sslmode=disable" -verbose up 1
 
-migratedown1: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5432/redditclone?sslmode=disable" -verbose down 1
+migratedown1: ; migrate -path db/migration -database "postgresql://root:secret@localhost:5431/redditclone?sslmode=disable" -verbose down 1
 
 sqlc: ; sqlc generate
 
