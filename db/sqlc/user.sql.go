@@ -9,17 +9,17 @@ import (
 
 const changeBlockedStatus = `-- name: ChangeBlockedStatus :exec
 UPDATE users
-SET blocked = $2
+SET isBlocked = $2
 WHERE id = $1
 `
 
 type ChangeBlockedStatusParams struct {
-	ID      int64 `json:"id"`
-	Blocked bool  `json:"blocked"`
+	ID        int64 `json:"id"`
+	Isblocked bool  `json:"isblocked"`
 }
 
 func (q *Queries) ChangeBlockedStatus(ctx context.Context, arg ChangeBlockedStatusParams) error {
-	_, err := q.db.ExecContext(ctx, changeBlockedStatus, arg.ID, arg.Blocked)
+	_, err := q.db.ExecContext(ctx, changeBlockedStatus, arg.ID, arg.Isblocked)
 	return err
 }
 
@@ -31,7 +31,7 @@ INSERT INTO users (
   avatar
 ) VALUES (
   $1, $2, $3, $4
-) RETURNING id, username, hashed_password, email, avatar, password_changed_at, created_at, blocked
+) RETURNING id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked
 `
 
 type CreateUserParams struct {
@@ -57,7 +57,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.Avatar,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
-		&i.Blocked,
+		&i.Isblocked,
 	)
 	return i, err
 }
@@ -73,7 +73,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, hashed_password, email, avatar, password_changed_at, created_at, blocked FROM users
+SELECT id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked FROM users
 WHERE id = $1 LIMIT 1
 `
 
@@ -88,13 +88,13 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.Avatar,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
-		&i.Blocked,
+		&i.Isblocked,
 	)
 	return i, err
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, hashed_password, email, avatar, password_changed_at, created_at, blocked FROM users
+SELECT id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked FROM users
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -122,7 +122,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.Avatar,
 			&i.PasswordChangedAt,
 			&i.CreatedAt,
-			&i.Blocked,
+			&i.Isblocked,
 		); err != nil {
 			return nil, err
 		}
@@ -141,7 +141,7 @@ const updateUser = `-- name: UpdateUser :one
 UPDATE users
 SET hashed_password = $2
 WHERE id = $1
-RETURNING id, username, hashed_password, email, avatar, password_changed_at, created_at, blocked
+RETURNING id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked
 `
 
 type UpdateUserParams struct {
@@ -160,7 +160,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.Avatar,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
-		&i.Blocked,
+		&i.Isblocked,
 	)
 	return i, err
 }

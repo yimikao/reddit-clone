@@ -30,5 +30,5 @@ WHERE id = $1;
 
 -- name: ChangeBlockedStatus :exec
 UPDATE users
-SET blocked = $2
+SET isBlocked = $2
 WHERE id = $1;

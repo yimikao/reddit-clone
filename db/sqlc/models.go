@@ -55,5 +55,5 @@ type User struct {
 	Avatar            string    `json:"avatar"`
 	PasswordChangedAt time.Time `json:"password_changed_at"`
 	CreatedAt         time.Time `json:"created_at"`
-	Blocked           bool      `json:"blocked"`
+	Isblocked         bool      `json:"isblocked"`
 }
