@@ -1,0 +1,4 @@
+make sub name unique(check migration 3)
+add reaction to post
+add points to comments (maybe likes or dislikes)
+add  user rank
