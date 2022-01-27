@@ -1,1 +1,1 @@
-ALTER TABLE users DROP COLUMN blocked;
+ALTER TABLE users ADD isBlocked BOOLEAN NOT NULL DEFAULT (false);
