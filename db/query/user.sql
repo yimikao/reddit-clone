@@ -3,7 +3,6 @@ INSERT INTO users (
   username,
   hashed_password,
   email,
-  avatar
 ) VALUES (
   $1, $2, $3, $4
 ) RETURNING *;
@@ -20,7 +19,9 @@ OFFSET $2;
 
 -- name: UpdateUser :one
 UPDATE users
-SET hashed_password = $2
+SET hashed_password = $2,
+    avatar = $3,
+    bio = $4
 WHERE id = $1
 RETURNING *;
 

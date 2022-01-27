@@ -3,7 +3,8 @@ CREATE TABLE "users" (
   "username" varchar NOT NULL,
   "hashed_password" varchar NOT NULL,
   "email" varchar UNIQUE NOT NULL,
-  "avatar" varchar NOT NULL,
+  "avatar" varchar NULL,
+  "bio" varchar NULL,
   "password_changed_at" timestamptz NOT NULL DEFAULT('0001-01-01 00:00:00Z'),  
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
@@ -11,7 +12,9 @@ CREATE TABLE "users" (
 CREATE TABLE "subs" (
   "id" bigint PRIMARY KEY,
   "creator_id" bigint NOT NULL,
+  "avatar" varchar NULL,
   "name" varchar NOT NULL,
+  "description" varchar NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now())
 );
 
