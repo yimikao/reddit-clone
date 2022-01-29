@@ -5,6 +5,7 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
 
 const changeBlockedStatus = `-- name: ChangeBlockedStatus :exec
@@ -27,27 +28,20 @@ const createUser = `-- name: CreateUser :one
 INSERT INTO users (
   username,
   hashed_password,
-  email,
-  avatar
+  email
 ) VALUES (
-  $1, $2, $3, $4
-) RETURNING id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked
+  $1, $2, $3
+) RETURNING id, username, hashed_password, email, avatar, bio, password_changed_at, created_at, isblocked
 `
 
 type CreateUserParams struct {
 	Username       string `json:"username"`
 	HashedPassword string `json:"hashed_password"`
 	Email          string `json:"email"`
-	Avatar         string `json:"avatar"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, createUser,
-		arg.Username,
-		arg.HashedPassword,
-		arg.Email,
-		arg.Avatar,
-	)
+	row := q.db.QueryRowContext(ctx, createUser, arg.Username, arg.HashedPassword, arg.Email)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -55,6 +49,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		&i.HashedPassword,
 		&i.Email,
 		&i.Avatar,
+		&i.Bio,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.Isblocked,
@@ -73,7 +68,7 @@ func (q *Queries) DeleteUser(ctx context.Context, id int64) error {
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked FROM users
+SELECT id, username, hashed_password, email, avatar, bio, password_changed_at, created_at, isblocked FROM users
 WHERE id = $1 LIMIT 1
 `
 
@@ -86,6 +81,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 		&i.HashedPassword,
 		&i.Email,
 		&i.Avatar,
+		&i.Bio,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.Isblocked,
@@ -94,7 +90,7 @@ func (q *Queries) GetUser(ctx context.Context, id int64) (User, error) {
 }
 
 const listUsers = `-- name: ListUsers :many
-SELECT id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked FROM users
+SELECT id, username, hashed_password, email, avatar, bio, password_changed_at, created_at, isblocked FROM users
 ORDER BY id
 LIMIT $1
 OFFSET $2
@@ -120,6 +116,7 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 			&i.HashedPassword,
 			&i.Email,
 			&i.Avatar,
+			&i.Bio,
 			&i.PasswordChangedAt,
 			&i.CreatedAt,
 			&i.Isblocked,
@@ -139,18 +136,27 @@ func (q *Queries) ListUsers(ctx context.Context, arg ListUsersParams) ([]User, e
 
 const updateUser = `-- name: UpdateUser :one
 UPDATE users
-SET hashed_password = $2
+SET hashed_password = $2,
+    avatar = $3,
+    bio = $4
 WHERE id = $1
-RETURNING id, username, hashed_password, email, avatar, password_changed_at, created_at, isblocked
+RETURNING id, username, hashed_password, email, avatar, bio, password_changed_at, created_at, isblocked
 `
 
 type UpdateUserParams struct {
-	ID             int64  `json:"id"`
-	HashedPassword string `json:"hashed_password"`
+	ID             int64          `json:"id"`
+	HashedPassword string         `json:"hashed_password"`
+	Avatar         sql.NullString `json:"avatar"`
+	Bio            sql.NullString `json:"bio"`
 }
 
 func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
-	row := q.db.QueryRowContext(ctx, updateUser, arg.ID, arg.HashedPassword)
+	row := q.db.QueryRowContext(ctx, updateUser,
+		arg.ID,
+		arg.HashedPassword,
+		arg.Avatar,
+		arg.Bio,
+	)
 	var i User
 	err := row.Scan(
 		&i.ID,
@@ -158,6 +164,7 @@ func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, e
 		&i.HashedPassword,
 		&i.Email,
 		&i.Avatar,
+		&i.Bio,
 		&i.PasswordChangedAt,
 		&i.CreatedAt,
 		&i.Isblocked,
