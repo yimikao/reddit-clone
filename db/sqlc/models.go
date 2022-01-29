@@ -34,10 +34,12 @@ type Post struct {
 }
 
 type Sub struct {
-	ID        int64     `json:"id"`
-	CreatorID int64     `json:"creator_id"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
+	ID          int64          `json:"id"`
+	CreatorID   int64          `json:"creator_id"`
+	Avatar      sql.NullString `json:"avatar"`
+	Name        string         `json:"name"`
+	Description sql.NullString `json:"description"`
+	CreatedAt   time.Time      `json:"created_at"`
 }
 
 type Subscriber struct {
@@ -48,12 +50,13 @@ type Subscriber struct {
 }
 
 type User struct {
-	ID                int64     `json:"id"`
-	Username          string    `json:"username"`
-	HashedPassword    string    `json:"hashed_password"`
-	Email             string    `json:"email"`
-	Avatar            string    `json:"avatar"`
-	PasswordChangedAt time.Time `json:"password_changed_at"`
-	CreatedAt         time.Time `json:"created_at"`
-	Isblocked         bool      `json:"isblocked"`
+	ID                int64          `json:"id"`
+	Username          string         `json:"username"`
+	HashedPassword    string         `json:"hashed_password"`
+	Email             string         `json:"email"`
+	Avatar            sql.NullString `json:"avatar"`
+	Bio               sql.NullString `json:"bio"`
+	PasswordChangedAt time.Time      `json:"password_changed_at"`
+	CreatedAt         time.Time      `json:"created_at"`
+	Isblocked         bool           `json:"isblocked"`
 }
