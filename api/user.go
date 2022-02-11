@@ -96,3 +96,27 @@ func (s *Server) getUser(ctx *gin.Context) {
 		CreatedAt:         u.CreatedAt,
 	})
 }
+
+func (s *Server) listUsers(ctx *gin.Context) {
+	args := db.ListUsersParams{
+		Limit:  5,
+		Offset: 5,
+	}
+
+	u, err := s.store.ListUsers(ctx, args)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	var ur []userResponse
+	for _, usr := range u {
+		ur = append(ur, newUserResponse(&usr))
+	}
+
+	ctx.JSON(http.StatusOK, ur)
+}
