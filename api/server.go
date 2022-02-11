@@ -48,6 +48,10 @@ func (s *Server) setupRouter() {
 	r := gin.Default()
 
 	r.GET("/", s.status)
+	ug := r.Group("users/")
+	ug.POST("create", s.createUser)
+	ug.GET("", s.getUser)
+	ug.GET("", s.listUsers)
 
 	s.router = r
 }
