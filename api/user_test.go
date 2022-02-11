@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -39,51 +40,70 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, u *db.User) {
 	require.NoError(t, err)
 
 	var userGotten db.User
-	err := json.Unmarshal(bytes, &userGotten)
+	err = json.Unmarshal(bytes, &userGotten)
 	require.NoError(t, err)
 
 	require.Equal(t, userGotten, u)
 }
-
 
 func TestGetUserAPI(t *testing.T) {
 	u, _ := randomUser(t)
 
 	testCases := []struct {
 		name          string
-		userID	int64
+		userID        int64
 		buildStubs    func(s *mockdb.MockStore)
 		checkResponse func(t *testing.T, r *httptest.ResponseRecorder)
 	}{
 		{
-			name: "OK",
+			name:   "OK",
 			userID: u.ID,
 			buildStubs: func(s *mockdb.MockStore) {
 				s.EXPECT().
-				GetUser(gomock.Any(), gomock.Eq(u.ID)).
-				Times(1).
-				Return(u, nil)					
+					GetUser(gomock.Any(), gomock.Eq(u.ID)).
+					Times(1).
+					Return(u, nil)
 			},
 			checkResponse: func(t *testing.T, r *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, r.Code)
-				requireBodyMatchUser(t, r.Body, u)
+				requireBodyMatchUser(t, r.Body, &u)
 			},
 		},
 		{
-			name: "Not Found",
+			name:   "Not Found",
 			userID: u.ID,
 			buildStubs: func(s *mockdb.MockStore) {
 				s.EXPECT().
-				GetUser(gomock.Any(), gomock.Eq(u.ID)).
-				Times(1).
-				Return(db.User{}, sql.ErrNoRows)
+					GetUser(gomock.Any(), gomock.Eq(u.ID)).
+					Times(1).
+					Return(db.User{}, sql.ErrNoRows)
 			},
 			checkResponse: func(t *testing.T, r *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, r.Code)
 			},
+		},
+	}
 
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-		}
+			store := mockdb.NewMockStore(ctrl)
+			tc.buildStubs(store)
+
+			url := fmt.Sprintf("/users/%d", tc.userID)
+			req, err := http.NewRequest(http.MethodGet, url, nil)
+			require.NoError(t, err)
+
+			r := httptest.NewRecorder()
+
+			s := newTestServer(t, store)
+			s.router.ServeHTTP(r, req)
+
+			tc.checkResponse(t, r)
+
+		})
 	}
 
 }
