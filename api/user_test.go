@@ -18,7 +18,7 @@ import (
 	"github.com/yimikao/reddit-clone/util"
 )
 
-func testUser(t *testing.T) (u db.User, password string) {
+func randomUser(t *testing.T) (u db.User, password string) {
 	password = util.RandomString(6)
 	hpwd, err := util.HashPassword(password)
 	require.NoError(t, err)
@@ -44,7 +44,7 @@ func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, u *db.User) {
 }
 
 func TestGetUserAPI(t *testing.T) {
-	u, _ := testUser(t)
+	u, _ := randomUser(t)
 
 	testCases := []struct {
 		name          string
