@@ -74,7 +74,7 @@ func (s *Server) createUser(ctx *gin.Context) {
 
 func (s *Server) getUser(ctx *gin.Context) {
 	var req getUserRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	if err := ctx.ShouldBindUri(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
